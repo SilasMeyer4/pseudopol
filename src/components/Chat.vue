@@ -11,6 +11,7 @@
   
   
   <script setup lang="ts">
+    import { sendMessageToWebsocket, getPublicIP } from "./network/client";
     import { nextTick, ref } from "vue";
     import { invoke } from "@tauri-apps/api/core";
     import Test from "./components/Test.vue";
@@ -18,12 +19,17 @@
     const chat_container = ref<HTMLElement>();
     const input_field = ref<string>("");
      
-    const send_message = (() => {
+    const send_message = ( async () => {
         const message = input_field.value;
         const messageContainer = document.createElement("div");
         messageContainer.className = "sender-message";
         messageContainer.innerHTML = `${message}`;
         chat_container.value?.appendChild(messageContainer);
+        sendMessageToWebsocket(message);
+        getPublicIP(); //testing getting ip
+
+        let ip = await invoke("get_public_ip");
+        console.log("Public IP from rust:", ip);
 
         nextTick(() => {
             if (chat_container.value) 
@@ -35,7 +41,6 @@
     });
 
     const receive_message = (() => {
-
 
 
     });
