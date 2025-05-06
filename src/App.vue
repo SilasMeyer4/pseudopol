@@ -4,7 +4,7 @@
 
     <Test v-if="name === 'Dennis'"></Test>
     <Chat></Chat>
-
+    <MainMenu></MainMenu>
 
     <form class="row" @submit.prevent="greet">
       <input id="greet-input" v-model="name" placeholder="Enter a name..." />
@@ -20,6 +20,7 @@ import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import Test from "./components/Test.vue";
 import Chat from "./components/Chat.vue";
+import MainMenu from "./components/Menus/MainMenu.vue";
 
 const greetMsg = ref("");
 const name = ref("");
