@@ -8,6 +8,7 @@
   </template>
   
   
+  
   <script setup lang="ts">
 
   const back_to_main_menu = (() => {
