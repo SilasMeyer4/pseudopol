@@ -1,0 +1,141 @@
+@startuml
+allow_mixing
+' Define styles (optional)
+skinparam packageStyle rectangle
+skinparam monochrome false
+skinparam spriteColor lightgreen
+
+' Define the Vue sprite icon (simplified, monochrome)
+sprite $vue <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="1">
+  <path d="M2.6 2.6C8.9 7.7 13.8 12.2 15 15c1.2-2.8 6.1-7.3 12.4-12.4C27.3 1.1 30 0 30 0s0 10.3-9.7 15C16.9 24.3 15 28 15 28s-1.9-3.7-9.7-13.7C0 10.3 0 0 0 0s2.7 1.1 2.6 2.6z" fill="#42b883"/>
+</svg>
+
+
+
+sprite $typeScript {
+0FFFFFFFFFFFF0
+0FFFFFFFFFFFF0
+00000FFFF00000
+00000FFFF00000
+00000FFFF00000
+00000FFFF00000
+00000FFFF00000
+00000FFFF00000
+00000FFFF00000
+}
+
+
+
+' Main application
+package "Pseudopol" {
+    
+    ' Frontend section
+    package "Frontend (Vue + TypeScript)" {
+       
+        class "Game Selector" as GameSelector <<$typeScript>>
+        class Settings {
+            Some Settings
+        }
+        class Pseudopol {
+            -Settings
+        }
+
+        package Menus {
+            
+            class "UI Lobby Screen" as LobbyUI <<$vue>> {
+                -chat
+                -game picker
+                -shows players
+                +Back
+            }
+
+
+            class "Main Menu" as MainMenu <<$vue>> {
+                Loads in LobbyScreen when selecting Host or Join
+                ==
+                -Host
+                -Join
+                -Setting
+                ==
+                +Back Button can be seen in every Menu except Main
+                ==
+                -Exit
+            }
+
+            class "Settings" as Settings<<$vue>> {
+                +Back  
+            }
+
+            MainMenu ..> LobbyUI: v-if
+            MainMenu ..> Settings: v-if
+            
+        }
+
+        component "WebView Bridge" as WebViewBridge
+
+
+    }
+
+component ENTRY
+ENTRY ..> MainMenu : App Startup
+
+
+
+
+    package "LocalData" {
+        class config
+        class games_folder {
+            Folder in which games can be
+        }
+    }
+
+    LobbyUI ..> games_folder: Loads game names and paths
+
+
+
+    ' Tauri bridge
+    component "Tauri WebView\n(TS <-> Rust)" as TauriBridge
+
+    ' Backend section
+    package "Backend (Rust)" {
+        component "Lobby Manager" as LobbyManager
+        component "Server Host" as ServerHost
+        component "Game Engine API" as GameEngine
+    }
+
+    ' Networking
+    package "Networking" {
+        component "Peer Client" as PeerClient
+        component "Peer Server" as PeerServer
+    }
+
+    ' Game Logic
+    package "Games" {
+        component "Game A"
+        component "Game B"
+    }
+}
+
+' Frontend communication
+LobbyUI ..> GameSelector : Select Game
+LobbyUI ..> WebViewBridge : Create/Join Lobby
+GameSelector ..> WebViewBridge : Start Game
+
+' Tauri Bridge
+WebViewBridge ..> TauriBridge : Invoke Command
+
+' Tauri to Backend
+TauriBridge ..> LobbyManager : create_lobby()
+TauriBridge ..> LobbyManager : join_lobby()
+TauriBridge ..> GameEngine : start_game()
+
+' Backend Communication
+LobbyManager ..> ServerHost : start_server()
+ServerHost ..> PeerServer : open_port()
+PeerClient ..> PeerServer : connect()
+
+' Game launch
+GameEngine ..> "Game A" : launch()
+GameEngine ..> "Game B" : launch()
+
+@enduml
