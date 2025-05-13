@@ -6,24 +6,24 @@
     <Chat></Chat>
     <MainMenu></MainMenu>
 
-    <form class="row" @submit.prevent="greet">
-      <input id="greet-input" v-model="name" placeholder="Enter a name..." />
-      <button type="submit">Greet</button>
-    </form>
-    <p>{{ greetMsg }}</p>
   </main>
 </template>
 
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import Test from "./components/Test.vue";
 import Chat from "./components/Chat.vue";
 import MainMenu from "./components/Menus/MainMenu.vue";
+import {create_games_directory} from "./components/Menus/GameSelector";
 
 const greetMsg = ref("");
 const name = ref("");
+
+onMounted(() => {
+  create_games_directory();
+});
 
 async function greet() {
   // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/

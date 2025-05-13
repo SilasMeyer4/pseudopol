@@ -1,7 +1,3 @@
-use reqwest::Error;
-use tauri::State;
-use super::websocket::{WebsocketState};
-
 #[tauri::command]
 pub async fn get_public_ip() -> Result<String, String> {
     let response = reqwest::get("https://api.ipify.org")

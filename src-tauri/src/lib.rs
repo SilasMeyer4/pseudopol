@@ -1,12 +1,8 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod network;
-use std::sync::{Arc, Mutex};
 
-use crate::network::online::{get_public_ip};
+use crate::network::online::get_public_ip;
 use crate::network::websocket;
-use tauri::Manager;
-use tokio::net::TcpStream;
-use tokio_websockets::WebSocketStream;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -15,13 +11,11 @@ fn greet(name: &str) -> String {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-
-
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        .manage(websocket::WebsocketState::new())
         .invoke_handler(tauri::generate_handler![
             greet,
             get_public_ip,
@@ -30,14 +24,10 @@ pub fn run() {
             websocket::send_message,
             websocket::close_websocket,
         ])
-        .setup(|app| {
-
-            Ok(())
-        })
+        .setup(|app| Ok(()))
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
 
 #[tauri::command]
 fn exit_application(app_handle: tauri::AppHandle) {

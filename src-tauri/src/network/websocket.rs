@@ -1,14 +1,16 @@
 use futures_util::{SinkExt, StreamExt};
-use tokio_tungstenite::{accept_async, MaybeTlsStream};
-use tokio_tungstenite::{connect_async, tungstenite::Error, tungstenite::protocol::Message, WebSocketStream};
 use std::sync::Arc;
-use tokio::sync::Mutex;
 use tauri::http::Uri;
 use tauri::{command, State};
-use tokio::net::{TcpStream, TcpListener};
+use tokio::net::{TcpListener, TcpStream};
+use tokio::sync::Mutex;
+use tokio_tungstenite::{accept_async, MaybeTlsStream};
+use tokio_tungstenite::{
+    connect_async, tungstenite::protocol::Message, tungstenite::Error, WebSocketStream,
+};
 
 pub struct WebsocketState {
-    socket: Arc<Mutex<Option<WebsocketConnection>>>
+    socket: Arc<Mutex<Option<WebsocketConnection>>>,
 }
 
 pub enum WebsocketConnection {
@@ -56,8 +58,6 @@ impl WebsocketState {
         }
         Ok(())
     }
-
-
 }
 
 #[tauri::command]
@@ -66,13 +66,17 @@ pub async fn connect_websocket(state: tauri::State<'_, WebsocketState>) -> Resul
 }
 
 #[tauri::command]
-pub async fn send_message(state: tauri::State<'_, WebsocketState>, message: String) -> Result<(), String> {
-    state.send_message(&message).await.map_err(|e| e.to_string())
+pub async fn send_message(
+    state: tauri::State<'_, WebsocketState>,
+    message: String,
+) -> Result<(), String> {
+    state
+        .send_message(&message)
+        .await
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub async fn close_websocket(state: tauri::State<'_, WebsocketState>) -> Result<(), String> {
     state.close().await.map_err(|e| e.to_string())
 }
-
-

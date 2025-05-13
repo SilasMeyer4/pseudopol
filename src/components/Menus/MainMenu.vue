@@ -6,7 +6,7 @@
         <v-btn @click="close_application">Exit</v-btn>
     </div>
 
-    <LobbyMenu v-if="Menu.LOBBY" :props="currentTab"></LobbyMenu>
+    <LobbyMenu v-if="currentTab === Menu.LOBBY" :props="currentTab"></LobbyMenu>
 
     <v-btn v-if="currentTab !== Menu.MAIN" @click="back_to_last_menu">Back</v-btn>
 
@@ -27,7 +27,7 @@ enum Menu {
 const currentTab = ref<Menu>(Menu.MAIN);
 
 const host_lobby = (async() => {
-    await invoke("connect_websocket");
+    //await invoke("connect_websocket");
 
     currentTab.value = Menu.LOBBY;
 });
@@ -57,7 +57,31 @@ const back_to_last_menu = (() => {
   </script>
   
   <style scoped>
+.game-selector {
+  max-height: 500px; /* Maximale Höhe des Containers */
+  overflow-x: auto;  /* Vertikales Scrollen aktivieren */
+}
 
+.game-row {
+  display: flex;
+  flex-wrap: wrap;  /* Zeilenumbruch bei Überlauf */
+  gap: 16px;        /* Abstand zwischen den Karten */
+}
+
+v-col {
+  padding: 0; /* Entfernt den Standardabstand */
+}
+
+v-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+v-card-title, v-card-subtitle {
+  text-align: center;
+}
   </style>
   <style>
 
