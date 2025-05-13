@@ -27,7 +27,7 @@ enum Menu {
 const currentTab = ref<Menu>(Menu.MAIN);
 
 const host_lobby = (async() => {
-    await invoke("start_server");
+    await invoke("connect_websocket");
 
     currentTab.value = Menu.LOBBY;
 });

@@ -1,64 +1,78 @@
 use futures_util::{SinkExt, StreamExt};
-use std::sync::{Arc, Mutex};
+use tokio_tungstenite::{accept_async, MaybeTlsStream};
+use tokio_tungstenite::{connect_async, tungstenite::Error, tungstenite::protocol::Message, WebSocketStream};
+use std::sync::Arc;
+use tokio::sync::Mutex;
 use tauri::http::Uri;
 use tauri::{command, State};
-use tokio::net::{TcpListener, TcpStream};
-use tokio_websockets::{ClientBuilder, Error, Message, ServerBuilder, WebSocketStream};
-
-pub struct Websocket {
-    ws_stream: WebSocketStream<TcpStream>,
-}
+use tokio::net::{TcpStream, TcpListener};
 
 pub struct WebsocketState {
-    socket: Arc<Mutex<Websocket>>,
+    socket: Arc<Mutex<Option<WebsocketConnection>>>
 }
 
-pub async fn start_websocket_server(ip: String, port: String) -> Result<(), Error> {
-  //  "127.0.0.1:3000"
-    let ip_port = ip + ":" + &port;
+pub enum WebsocketConnection {
+    Basic(WebSocketStream<MaybeTlsStream<TcpStream>>),
+}
 
-    println!("Your ip and port{}", ip_port);
-    let listener = TcpListener::bind(ip_port)
-        .await
-        .expect("Error binding to port");
-
-    tokio::spawn(async move {
-        while let Ok((stream, _)) = listener.accept().await {
-            let (_resquest, mut ws_stream) = ServerBuilder::new()
-                .accept(stream)
-                .await
-                .expect("Error accepting WebSocket connection");
-
-            tokio::spawn(async move {
-                while let Some(Ok(msg)) = ws_stream.next().await {
-                    if msg.is_text() || msg.is_binary() {
-                        ws_stream
-                            .send(Message::text(
-                                String::from("Rust says hello") + msg.as_text().unwrap(),
-                            ))
-                            .await
-                            .expect("Error sending response");
-                    }
-                }
-
-                Ok::<_, Error>(())
-            });
+impl WebsocketState {
+    pub fn new() -> Self {
+        WebsocketState {
+            socket: Arc::new(Mutex::new(None)),
         }
-        Ok::<_, Error>(())
-    });
-    Ok(())
+    }
+
+    pub async fn connect(&self) -> Result<(), Error> {
+        let mut lock = self.socket.lock().await;
+        if lock.is_none() {
+            let (stream, _) = connect_async("ws://127.0.0.1:8080").await?;
+            *lock = Some(WebsocketConnection::Basic(stream));
+            println!("WebSocket connected");
+        } else {
+            println!("WebSocket already connected");
+        }
+        Ok(())
+    }
+
+    pub async fn close(&self) -> Result<(), Error> {
+        let mut lock = self.socket.lock().await;
+        if let Some(WebsocketConnection::Basic(stream)) = lock.as_mut() {
+            stream.close(None).await?;
+            println!("WebSocket connection closed");
+            *lock = None;
+        } else {
+            println!("No active connection to close");
+        }
+        Ok(())
+    }
+
+    pub async fn send_message(&self, message: &str) -> Result<(), Error> {
+        let mut lock = self.socket.lock().await;
+        if let Some(WebsocketConnection::Basic(stream)) = lock.as_mut() {
+            stream.send(Message::Text(message.into())).await?;
+            println!("Sent message: {}", message);
+        } else {
+            println!("WebSocket not connected");
+        }
+        Ok(())
+    }
+
+
 }
 
-// #[tauri::command] Job of Frontend
-// pub async fn send_message_to_websocket(uri: &Uri, message: &str) -> Result<(), Error> {
-//     let ws_stream = WebSocketStream::connect(uri).await.expect("Error connecting to WebSocket");
-//     let mut locked_websocket = websocket.lock().await.unwrap();
+#[tauri::command]
+pub async fn connect_websocket(state: tauri::State<'_, WebsocketState>) -> Result<(), String> {
+    state.connect().await.map_err(|e| e.to_string())
+}
 
-//     if locked_websocket.ws_stream.is_none() {
-//         locked_websocket.ws_stream = Some(ws_stream);
-//     }
+#[tauri::command]
+pub async fn send_message(state: tauri::State<'_, WebsocketState>, message: String) -> Result<(), String> {
+    state.send_message(&message).await.map_err(|e| e.to_string())
+}
 
-//     locked_websocket.ws_stream.as_mut().unwrap().send(Message::text(message)).await.expect("Error sending message to WebSocket");
+#[tauri::command]
+pub async fn close_websocket(state: tauri::State<'_, WebsocketState>) -> Result<(), String> {
+    state.close().await.map_err(|e| e.to_string())
+}
 
-//     ok(())
-// }
+

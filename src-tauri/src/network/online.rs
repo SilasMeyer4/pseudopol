@@ -1,5 +1,6 @@
 use reqwest::Error;
-use super::websocket::start_websocket_server;
+use tauri::State;
+use super::websocket::{WebsocketState};
 
 #[tauri::command]
 pub async fn get_public_ip() -> Result<String, String> {
@@ -12,21 +13,4 @@ pub async fn get_public_ip() -> Result<String, String> {
     println!("{}", ip);
 
     Ok(ip)
-}
-
-#[tauri::command]
-pub async fn start_server() -> Result<String, String>{
-    let pub_ip = get_public_ip().await;
-    match pub_ip {
-        Ok(ip) => {
-            tauri::async_runtime::spawn(start_websocket_server("0.0.0.0".to_owned(), "5555".to_owned())); //check port
-            println!("Started websocket");
-        }
-        _ => {
-            println!("Error");
-        }
-    } 
-
-
-    Ok("".to_owned())
 }
