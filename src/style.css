@@ -1,0 +1,35 @@
+.title {
+    margin-bottom: 3vh;
+    border-bottom: 2px black solid;
+      padding: 1rem 0; /* padding top and bottom */
+ font-weight: 700;
+  font-size: 3rem;
+    padding-bottom: 3vh;
+    padding-top: 3vh;
+      letter-spacing: 0.05em;
+        text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+          background: linear-gradient(90deg, #000000, #0061c2);
+        text-transform: uppercase;
+  font-variant: small-caps;
+  color: linear-gradient(90deg, #000000, #0061c2);
+  
+  font-family: 'Montserrat', sans-serif;
+  
+  border-bottom: 2px solid black;
+  /* Use margin-bottom with px or rem for stable spacing */
+  text-align: center;
+}
+
+
+#app {
+     min-height: 100vh; /* at least full viewport height */
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(210deg, #434343, #161616);
+  /* optional: to avoid scrollbars */
+  overflow-x: hidden;
+}
+
