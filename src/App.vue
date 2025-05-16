@@ -1,9 +1,7 @@
 <template>
   <main class="container">
-    <h1>Welcome to Tauri + Vue</h1>
+    <h1 class="title">Pseudopol</h1>
 
-    <Test v-if="name === 'Dennis'"></Test>
-    <Chat></Chat>
     <MainMenu></MainMenu>
 
   </main>
@@ -11,6 +9,9 @@
 
 
 <script setup lang="ts">
+
+import './style.css';
+
 import { onMounted, ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import Test from "./components/Test.vue";

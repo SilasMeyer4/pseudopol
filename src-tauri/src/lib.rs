@@ -1,5 +1,6 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod network;
+mod launch;
 
 use crate::network::online::get_public_ip;
 use crate::network::websocket;
@@ -23,6 +24,7 @@ pub fn run() {
             websocket::connect_websocket,
             websocket::send_message,
             websocket::close_websocket,
+            launch::launch_game,
         ])
         .setup(|app| Ok(()))
         .run(tauri::generate_context!())

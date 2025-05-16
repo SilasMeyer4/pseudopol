@@ -1,11 +1,16 @@
 <template>
   <v-container>
+  <v-text class="text-subtitle-2 ip-adress" v-if="playerInfo.isHost">{{ipAddr}}</v-text>
+    <v-container>
+      <Chat></Chat>
+    </v-container>
 
 
-
-
-     <v-container class="game-selector">
-      <v-row class="horizontal-scroll-row">
+    <div>
+        Selected Game: {{selected_game.name}}
+    </div>
+     <v-container class="game-selector" :class="{'single-player': isSinglePlayer}">
+      <v-row :class="[isSinglePlayer ? 'vertical-scroll-row' : 'horizontal-scroll-row']">
         <v-col
           v-for="game in games"
           :key="game.name"
@@ -18,18 +23,22 @@
           >
             <v-card-title class="text-h6">{{ game.name }}</v-card-title>
             <v-card-subtitle class="text-caption text-grey-darken-1">{{ game.path }}</v-card-subtitle>
+            <v-card-actions v-if="isSinglePlayer">
+              <v-btn color="primary" @click.stop="launch_game(game.path)">Start</v-btn>
+            </v-card-actions>
           </v-card>
         </v-col>
       </v-row>
     </v-container>
-  </v-container>
-    <div>
-        {{selected_game}}
-    </div>
 
-    
-  <v-btn @click="add_game">Test Button</v-btn>
-  <v-btn @click="back_to_main_menu"></v-btn>
+  <v-btn @click="launch_game(selected_game.path)" class="start-game-btn">Start Game</v-btn>
+
+
+  </v-container>
+
+
+  
+
 
   </template>
   
@@ -38,18 +47,39 @@
   <script setup lang="ts">
 import { onMounted, ref } from 'vue';
   import * as GameSelector from "./GameSelector";
+  import { invoke } from '@tauri-apps/api/core';
+import { PlayerInfo } from './MenuData';
+import Chat from '../Chat.vue';
+  
+
+  const props = defineProps<{
+    playerInfo: PlayerInfo;
+  }>()
 
 
   const games = ref<GameSelector.GameList>();
-  const selected_game = ref<GameSelector.GameEntry>();
+  const selected_game = ref<GameSelector.GameEntry>({name: "", path: ""});
+  const isSinglePlayer = ref(true);
+  const ipAddr = ref("");
 
   onMounted(async () => {
+    isSinglePlayer.value = props.playerInfo.isSinglePlayer;
+
+    if (props.playerInfo.isHost) {
+      ipAddr.value = await invoke("get_public_ip");
+    }
+
+
     games.value = await GameSelector.load_game_entries();
     console.log(games);
   });
 
   const select_game = ((game: GameSelector.GameEntry) => {
     selected_game.value = game;
+  });
+
+  const launch_game = ((path: string) => {
+      invoke("launch_game", {path: path});
   });
 
   const add_game = (() => {
@@ -71,9 +101,6 @@ import { onMounted, ref } from 'vue';
   });
 
 
-  const back_to_main_menu = (() => {
-    console.log("helo");
-  });
 
 
   </script>
@@ -107,6 +134,22 @@ import { onMounted, ref } from 'vue';
   border-radius: 4px;
 }
 
+/* Vertical scroll styling */
+.vertical-scroll-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+.single-player {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
 /* Customize card appearance */
 .game-card {
   min-width: 220px;
@@ -121,6 +164,19 @@ import { onMounted, ref } from 'vue';
 .game-card-inner:hover {
   transform: translateY(-4px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.start-game-btn{
+  position: absolute;
+  bottom: 0px;
+  right: 16px;
+  z-index: 1; /* Ensures it stays on top */
+
+}
+
+.ip-adress{
+  position: relative;
+  top: -3vh; /* Move up by 10 pixels */
 }
   </style>
   <style>

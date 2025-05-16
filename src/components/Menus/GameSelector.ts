@@ -44,7 +44,7 @@ export function sanitizeFileName(name: string): string {
   return name.replace(/[<>:"/\\|?*]/g, "_");
 }
 
-export async function delete_character(name: string) {
+export async function remove_game(name: string) {
   const sanitizedName = sanitizeFileName(name);
   await remove(`data/characters/${sanitizedName}.json`, {baseDir: BaseDirectory.AppData});
 }
