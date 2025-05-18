@@ -29,10 +29,17 @@ jobs:
         run: |
           npm run doc
 
-      - name: Install system dependencies for GTK and JavascriptCore
+      - name: Install system dependencies for GTK, JavascriptCore, and libsoup
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libglib2.0-dev libwebkit2gtk-4.0-dev pkg-config build-essential libjavascriptcoregtk-4.1-dev
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libglib2.0-dev \
+            libwebkit2gtk-4.0-dev \
+            pkg-config \
+            build-essential \
+            libjavascriptcoregtk-4.1-dev \
+            libsoup-3.0-dev
 
       - name: Set up Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
