@@ -1,0 +1,38 @@
+name: Generate PlantUML SVG
+
+on:
+  push:
+    paths:
+      - '**/diagramm.puml'
+
+jobs:
+  generate-svg:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Download PlantUML
+        run: |
+          curl -o plantuml.jar https://downloads.sourceforge.net/project/plantuml/plantuml.jar
+
+      - name: Generate SVG from diagramm.puml
+        run: |
+          java -jar plantuml.jar -tsvg diagramm.puml
+
+      - name: Commit and push updated SVG
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add diagramm.svg
+          git commit -m "Update diagramm.svg [automated]"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
