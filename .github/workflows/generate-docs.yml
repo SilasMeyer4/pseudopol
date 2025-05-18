@@ -1,0 +1,57 @@
+name: Generate Docs
+
+on:
+  push:
+    branches:
+      - lobbyFront
+
+permissions:
+  contents: write
+
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install frontend dependencies
+        run: |
+          cd src
+          npm install
+
+      - name: Generate TypeScript docs
+        run: |
+          cd src
+          npm run doc
+
+      - name: Set up Rust
+        uses: actions/setup-rust@v1
+
+      - name: Generate Rust docs
+        run: |
+          cd src-tauri
+          cargo doc --no-deps
+
+      - name: Collect all docs into docs-out
+        run: |
+          mkdir -p docs-out/typescript
+          mkdir -p docs-out/rust
+          cp -r src/docs/* docs-out/typescript/
+          cp -r src-tauri/target/doc/* docs-out/rust/
+
+      - name: Commit and push documentation
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add docs-out
+          git commit -m "Update generated docs [automated]" || echo "No changes"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
