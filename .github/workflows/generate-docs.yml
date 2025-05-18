@@ -23,12 +23,10 @@ jobs:
 
       - name: Install frontend dependencies
         run: |
-          cd src
           npm install
 
       - name: Generate TypeScript docs
         run: |
-          cd src
           npm run doc
 
 
