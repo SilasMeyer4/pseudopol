@@ -25,7 +25,7 @@ jobs:
 
       - name: Generate SVG from diagramm.puml
         run: |
-          java -jar plantuml.jar -tsvg diagramm.puml
+          java -jar plantuml.jar -tsvg docs/diagramm.puml
 
       - name: Commit and push updated SVG
         run: |
