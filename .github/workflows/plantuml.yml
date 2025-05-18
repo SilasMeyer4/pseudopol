@@ -21,7 +21,7 @@ jobs:
 
       - name: Download PlantUML
         run: |
-          curl -o plantuml.jar https://downloads.sourceforge.net/project/plantuml/plantuml.jar
+          curl -L -o plantuml.jar https://github.com/plantuml/plantuml/releases/latest/download/plantuml.jar
 
       - name: Generate SVG from diagramm.puml
         run: |
