@@ -11,12 +11,20 @@ export interface GameEntry {
     path: string
 }
 
+/**
+ * @param game_list Liste von Game Entries
+ * Makes some nice things
+ */
 export async function save_games_list(game_list: GameList) {
     let json_data = JSON.stringify(game_list, null, 2);
     console.log(json_data);
     await writeTextFile(`games/entries.json`, json_data, {baseDir: BaseDirectory.AppData});
 }
 
+/**
+ * @returns Game List
+ * Makes some nice things2
+ */
 export async function load_game_entries(): Promise<GameList> {
     let json_data = await readTextFile("games\\entries.json", {baseDir: BaseDirectory.AppData});
     return JSON.parse(json_data);    
