@@ -31,8 +31,11 @@ jobs:
           cd src
           npm run doc
 
-      - name: Set up Rust
-        uses: actions/setup-rust@v1
+
+      - name: Set up Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
 
       - name: Generate Rust docs
         run: |
