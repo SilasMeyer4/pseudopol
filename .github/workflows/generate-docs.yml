@@ -49,7 +49,7 @@ jobs:
       - name: Generate Rust docs for src-tauri/src
         run: |
           cd src-tauri
-          cargo doc --no-deps --document-private-items --manifest-path ./Cargo.toml
+          RUSTFLAGS="-Awarnings" cargo doc --no-deps --document-private-items --manifest-path ./Cargo.toml
 
       - name: Collect all docs into docs-out
         run: |
