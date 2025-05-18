@@ -38,11 +38,11 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-
-      - name: Generate Rust docs
+          
+      - name: Generate Rust docs for src-tauri/src
         run: |
           cd src-tauri
-          cargo doc --no-deps
+          cargo doc --no-deps --document-private-items --manifest-path src-tauri/Cargo.toml
 
       - name: Collect all docs into docs-out
         run: |
