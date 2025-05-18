@@ -39,7 +39,7 @@ package "Pseudopol" {
         }
         class Pseudopol {
             -Settings
-            -OtherStuffTest
+            -OtherStuff
         }
 
         package Menus {
