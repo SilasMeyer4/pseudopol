@@ -2659,9 +2659,9 @@ checksum = "d05e27ee213611ffe7d6348b942e8f942b37114c00cc03cec254295a4a17852e"
 
 [[package]]
 name = "openssl-sys"
-version = "0.9.107"
+version = "0.9.108"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8288979acd84749c744a9014b4382d42b8f7b2592847b5afb2ed29e5d16ede07"
+checksum = "e145e1651e858e820e4860f7b9c5e169bc1d8ce1c86043be79fa7b7634821847"
 dependencies = [
  "cc",
  "libc",
@@ -4290,9 +4290,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-dialog"
-version = "2.2.1"
+version = "2.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bcaf6e5d6062423a0f711a23c2a573ccba222b6a16a9322d8499928f27e41376"
+checksum = "a33318fe222fc2a612961de8b0419e2982767f213f54a4d3a21b0d7b85c41df8"
 dependencies = [
  "log",
  "raw-window-handle",
@@ -4308,9 +4308,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-fs"
-version = "2.2.1"
+version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88371e340ad2f07409a3b68294abe73f20bc9c1bc1b631a31dc37a3d0161f682"
+checksum = "33ead0daec5d305adcefe05af9d970fc437bcc7996052d564e7393eb291252da"
 dependencies = [
  "anyhow",
  "dunce",
@@ -4326,7 +4326,6 @@ dependencies = [
  "thiserror 2.0.12",
  "toml",
  "url",
- "uuid",
 ]
 
 [[package]]
@@ -4691,9 +4690,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-websockets"
-version = "0.11.3"
+version = "0.11.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fbc46f9dc832c663a5db08513162001a29ac820913275d58943f942c2bc1c435"
+checksum = "9fcaf159b4e7a376b05b5bfd77bfd38f3324f5fce751b4213bfc7eaa47affb4e"
 dependencies = [
  "base64 0.22.1",
  "bytes",
