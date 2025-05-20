@@ -4,6 +4,24 @@
 
     <MainMenu></MainMenu>
 
+
+
+
+    <!--Update DIALOG-->
+    <v-dialog v-model="updateDialog" persistent max-width="400">
+      <v-card>
+        <v-card-title class="text-h6">Update</v-card-title>
+        <v-card-text>
+           Do you want to update the application (recommended)?
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="updateDialog = false">Abbrechen</v-btn>
+          <v-btn text @click="updateDialog = false ;runUpdater()">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
   </main>
 </template>
 
@@ -18,12 +36,18 @@ import Test from "./components/Test.vue";
 import Chat from "./components/Chat.vue";
 import MainMenu from "./components/Menus/MainMenu.vue";
 import {create_games_directory} from "./components/Menus/GameSelector";
+import { check_for_update, runUpdater } from './utils/updater';
 
 const greetMsg = ref("");
 const name = ref("");
+const updateDialog = ref(false);
 
-onMounted(() => {
+onMounted(async() => {
   create_games_directory();
+  if (await check_for_update()) {
+    updateDialog.value = true;
+  }
+  
 });
 
 async function greet() {

@@ -99,7 +99,7 @@ const add_game = (async(name: string) => {
     });
 
     if (file !== null) {
-        let newEntry: GameSelector.GameEntry = {name: name, path: file};
+        let newEntry: GameSelector.GameEntry = {name: name, path: file, playTime: new GameSelector.Time(0)};
         gameList.value = [...gameList.value, newEntry];
         GameSelector.save_games_list(gameList.value);
         console.log(gameList);

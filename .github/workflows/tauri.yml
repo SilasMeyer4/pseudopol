@@ -1,0 +1,64 @@
+name: Tauri Multi-Platform Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: windows
+          - os: macos-latest
+            platform: macos
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure tag is from main (only on Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          MAIN_COMMIT=$(git rev-parse origin/main)
+          TAG_COMMIT=$(git rev-list -n 1 ${{ github.ref_name }})
+          if [ "$MAIN_COMMIT" != "$TAG_COMMIT" ]; then
+            echo "❌ Tag is not on the latest main commit. Aborting."
+            exit 1
+          fi
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Set up environment variables for key
+        shell: bash
+        run: |
+          echo "${{ secrets.TAURI_PRIVATE_KEY }}" | base64 -d > private.key
+
+      - name: Tauri Build and Release
+        uses: tauri-apps/tauri-action@v0
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Release ${{ github.ref_name }}"
+          releaseDraft: false
+          prerelease: false
+          args: "--target ${{ matrix.platform }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: private.key
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}

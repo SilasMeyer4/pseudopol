@@ -5,7 +5,7 @@
       <Chat></Chat>
     </v-container>
 
-
+    <v-btn @click="add_game">Add Test Data</v-btn>
     <div>
         Selected Game: {{selected_game.name}}
     </div>
@@ -23,15 +23,16 @@
           >
             <v-card-title class="text-h6">{{ game.name }}</v-card-title>
             <v-card-subtitle class="text-caption text-grey-darken-1">{{ game.path }}</v-card-subtitle>
+            <v-card-text>{{ game.playTime.seconds }}</v-card-text>
             <v-card-actions v-if="isSinglePlayer">
-              <v-btn color="primary" @click.stop="launch_game(game.path)">Start</v-btn>
+              <v-btn color="primary" @click.stop="launch_game(game)">Start</v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
       </v-row>
     </v-container>
 
-  <v-btn @click="launch_game(selected_game.path)" class="start-game-btn">Start Game</v-btn>
+  <v-btn @click="launch_game(selected_game)" class="start-game-btn">Start Game</v-btn>
 
 
   </v-container>
@@ -58,7 +59,10 @@ import Chat from '../Chat.vue';
 
 
   const games = ref<GameSelector.GameList>();
-  const selected_game = ref<GameSelector.GameEntry>({name: "", path: ""});
+  const selected_game = ref<GameSelector.GameEntry>({
+    name: "", 
+    path: "",
+    playTime: new GameSelector.Time(0)});
   const isSinglePlayer = ref(true);
   const ipAddr = ref("");
 
@@ -78,14 +82,27 @@ import Chat from '../Chat.vue';
     selected_game.value = game;
   });
 
-  const launch_game = ((path: string) => {
-      invoke("launch_game", {path: path});
+  const launch_game = ((game: GameSelector.GameEntry) => {
+      invoke("launch_game", {path: game.path})
+        .then((timePlayed) => {
+            console.log("typescript", timePlayed);
+            game.playTime.addSec(timePlayed as number);
+            if (games.value)
+            {
+              GameSelector.save_games_list(games.value);
+            }
+          
+        });
+     
   });
 
   const add_game = (() => {
     let list: GameSelector.GameList = [];
     for (let index = 0; index < 10; index++) {
-      const newGame: GameSelector.GameEntry = {name: `Test${index}`, path: "wewewe"};
+      const newGame: GameSelector.GameEntry = {
+        name: `Test${index}`, 
+        path: "wewewe", 
+        playTime: new GameSelector.Time(0)};
       list.push(newGame);
     }
 

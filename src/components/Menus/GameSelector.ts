@@ -6,9 +6,42 @@ import { openPath } from "@tauri-apps/plugin-opener";
 
 export type GameList = GameEntry[]
 
+export class Time {
+
+  constructor(hours: number, minutes: number, seconds: number);
+  constructor(totalSeconds: number);
+
+  constructor(a: number, b?: number, c?: number) {
+    if (b !== undefined && c !== undefined) {
+      // Called with (hours, minutes, seconds)
+      this.hours = a;
+      this.minutes = b;
+      this.seconds = c;
+    } else {
+      // Called with (totalSeconds)
+      const totalSeconds = a;
+      this.seconds = totalSeconds % 60;
+      this.minutes = (totalSeconds / 60) % 60;
+      this.hours = (totalSeconds / 3600) 
+    }
+  }
+
+  public addSec(seconds: number) {
+      this.seconds += (seconds % 60);
+      this.minutes += (seconds / 60) % 60;
+      this.hours += (seconds / 3600) 
+  }
+
+  hours: number = 0
+  minutes: number = 0
+  seconds: number = 0
+}
+
 export interface GameEntry {
     name: string,
-    path: string
+    path: string,
+    playTime: Time
+    
 }
 
 /**
@@ -27,7 +60,13 @@ export async function save_games_list(game_list: GameList) {
  */
 export async function load_game_entries(): Promise<GameList> {
     let json_data = await readTextFile("games\\entries.json", {baseDir: BaseDirectory.AppData});
-    return JSON.parse(json_data);    
+      const rawList: GameEntry[] = JSON.parse(json_data);
+
+    // Convert plain objects to proper Time instances
+    return rawList.map((game) => ({
+      ...game,
+      playTime: new Time(game.playTime.hours, game.playTime.minutes, game.playTime.seconds),
+    }));   
 }
 
 export async function open_appdata_in_file_system() {

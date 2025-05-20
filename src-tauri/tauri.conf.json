@@ -31,5 +31,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEQ4RjM0QUI3N0U1N0VCODEKUldTQjYxZCt0MHJ6Mk5Sc3VZdFpJREVDbGRTQ0dpcmV3bDhlK1ZRR2F0a3EybllCaDBDeEw5cEEK",
+      "endpoints": [
+        "https://github.com/SilasMeyer4/pseudopol/releases/latest/download/latest.json"
+      ]
+    }
   }
 }

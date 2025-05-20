@@ -1,10 +1,8 @@
-use futures_util::{SinkExt, StreamExt};
+use futures_util::{SinkExt};
 use std::sync::Arc;
-use tauri::http::Uri;
-use tauri::{command, State};
-use tokio::net::{TcpListener, TcpStream};
+use tokio::net::{TcpStream};
 use tokio::sync::Mutex;
-use tokio_tungstenite::{accept_async, MaybeTlsStream};
+use tokio_tungstenite::{MaybeTlsStream};
 use tokio_tungstenite::{
     connect_async, tungstenite::protocol::Message, tungstenite::Error, WebSocketStream,
 };
