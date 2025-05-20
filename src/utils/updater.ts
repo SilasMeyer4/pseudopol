@@ -40,7 +40,6 @@ export async function runUpdater() {
     }
 }
 
-
 export async function check_for_update(): Promise<boolean> {
     const update = await check();
     if (update) {
