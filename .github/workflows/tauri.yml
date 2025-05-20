@@ -56,6 +56,6 @@ jobs:
           prerelease: false
           args: "--target ${{ matrix.platform }}"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           TAURI_PRIVATE_KEY: private.key
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
