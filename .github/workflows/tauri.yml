@@ -59,12 +59,6 @@ jobs:
         env:
           TAURI_DEBUG: "1"
 
-
-      - name: Set up environment variables for key
-        shell: bash
-        run: |
-            echo "${{ secrets.TAURI_PRIVATE_KEY }}" > private.key
-
       - name: Make linuxdeploy executable
         if: matrix.os == 'ubuntu-latest'
         run: |
@@ -82,5 +76,5 @@ jobs:
           args: "--target ${{ matrix.platform }}"
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ./private.key
+          TAURI_SIGNING_PRIVATE_KEY: ${{secrets.TAURI_PRIVATE_KEY}}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
