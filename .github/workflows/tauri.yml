@@ -24,15 +24,17 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Ensure tag is from main (only on Ubuntu)
+      - name: Ensure tag is on main branch history (only on Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
-          MAIN_COMMIT=$(git rev-parse origin/main)
-          TAG_COMMIT=$(git rev-list -n 1 ${{ github.ref_name }})
-          if [ "$MAIN_COMMIT" != "$TAG_COMMIT" ]; then
-            echo "❌ Tag is not on the latest main commit. Aborting."
+            TAG_COMMIT=$(git rev-list -n 1 ${{ github.ref_name }})
+            git fetch origin main
+            if git merge-base --is-ancestor $TAG_COMMIT origin/main; then
+            echo "✅ Tag commit is in main branch history."
+            else
+            echo "❌ Tag commit is NOT in main branch history. Aborting."
             exit 1
-          fi
+            fi
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
