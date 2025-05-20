@@ -36,8 +36,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libglib2.0-dev libgtk-3-dev libsoup-3.0-dev pkg-config
-          # Set PKG_CONFIG_PATH so pkg-config can find libsoup-3.0.pc
+          sudo apt-get install -y libglib2.0-dev libgtk-3-dev libsoup-3.0-dev pkg-config libjavascriptcoregtk-4.1-dev
           echo "export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig" >> $GITHUB_ENV
 
       - name: Install dependencies
