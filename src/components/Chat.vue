@@ -14,7 +14,6 @@
     import { sendMessageToWebsocket, getPublicIP } from "./network/client";
     import { nextTick, ref } from "vue";
     import { invoke } from "@tauri-apps/api/core";
-    import Test from "./components/Test.vue";
 
     const chat_container = ref<HTMLElement>();
     const input_field = ref<string>("");
@@ -37,11 +36,6 @@
                 chat_container.value.scrollTop = chat_container.value?.scrollHeight;
             } 
         });
-
-    });
-
-    const receive_message = (() => {
-
 
     });
 
