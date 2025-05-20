@@ -29,7 +29,6 @@
 <script setup lang="ts">
 
 import './style.css';
-
 import { onMounted, ref } from "vue";
 import MainMenu from "./components/Menus/MainMenu.vue";
 import {create_games_directory} from "./components/Menus/GameSelector";
