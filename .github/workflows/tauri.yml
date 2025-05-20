@@ -9,6 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
+        fail-fast: false
         include:
           - os: ubuntu-latest
             platform: x86_64-unknown-linux-gnu
