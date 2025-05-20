@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["WebsocketConnection"],"fn":["close_websocket","connect_websocket","send_message"],"struct":["WebsocketState"]};

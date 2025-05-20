@@ -1,1 +1,0 @@
-searchState.loadedDescShard("pseudopol_lib", 0, "Erstellt einen neuen Benutzer.\nReturns the argument unchanged.\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\nCalls <code>U::from(self)</code>.")
