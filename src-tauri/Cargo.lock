@@ -3059,7 +3059,7 @@ dependencies = [
 
 [[package]]
 name = "pseudopol"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "futures-util",
  "http 1.3.1",
