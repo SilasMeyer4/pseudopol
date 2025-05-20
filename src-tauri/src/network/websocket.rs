@@ -16,6 +16,7 @@ pub enum WebsocketConnection {
 }
 
 impl WebsocketState {
+    #[allow(dead_code)]
     pub fn new() -> Self {
         WebsocketState {
             socket: Arc::new(Mutex::new(None)),

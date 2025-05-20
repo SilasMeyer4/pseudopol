@@ -27,7 +27,7 @@ pub fn run() {
             websocket::close_websocket,
             launch::launch_game,
         ])
-        .setup(|app| Ok(()))
+        .setup(|_app| Ok(()))
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
