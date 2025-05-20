@@ -12,9 +12,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            platform: x86_64-unknown-linux-gnu
+            platform: ubuntu-22.04
           - os: windows-latest
             platform: x86_64-pc-windows-msvc
+          - os: 'macos-latest' # for Intel based macs.
+            platform: x86_64-apple-darwin
           - os: macos-latest
             platform: aarch64-apple-darwin
     runs-on: ${{ matrix.os }}
