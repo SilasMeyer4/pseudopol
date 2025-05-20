@@ -73,7 +73,6 @@
   
   <script setup lang="ts">
     import { invoke } from '@tauri-apps/api/core';
-    import { ask } from '@tauri-apps/plugin-dialog';
     import { ref } from 'vue';
     import LobbyMenu from './LobbyMenu.vue';
     import SettingsMenu from './SettingsMenu.vue';

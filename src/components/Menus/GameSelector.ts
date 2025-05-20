@@ -1,7 +1,5 @@
-import { appDataDir, executableDir } from "@tauri-apps/api/path";
-import {writeTextFile, readTextFile, BaseDirectory, create, open, exists, mkdir, readDir, remove} from "@tauri-apps/plugin-fs"
-import { invoke } from "@tauri-apps/api/core";
-import { path } from "@tauri-apps/api";
+import { appDataDir} from "@tauri-apps/api/path";
+import {writeTextFile, readTextFile, BaseDirectory, exists, mkdir, remove} from "@tauri-apps/plugin-fs"
 import { openPath } from "@tauri-apps/plugin-opener";
 
 export type GameList = GameEntry[]

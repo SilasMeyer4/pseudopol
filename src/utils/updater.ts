@@ -1,6 +1,5 @@
 import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
-import { ca } from "vuetify/locale";
 
 export async function runUpdater() {
 

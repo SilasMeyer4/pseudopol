@@ -31,15 +31,10 @@
 import './style.css';
 
 import { onMounted, ref } from "vue";
-import { invoke } from "@tauri-apps/api/core";
-import Test from "./components/Test.vue";
-import Chat from "./components/Chat.vue";
 import MainMenu from "./components/Menus/MainMenu.vue";
 import {create_games_directory} from "./components/Menus/GameSelector";
 import { check_for_update, runUpdater } from './utils/updater';
 
-const greetMsg = ref("");
-const name = ref("");
 const updateDialog = ref(false);
 
 onMounted(async() => {
@@ -50,10 +45,6 @@ onMounted(async() => {
   
 });
 
-async function greet() {
-  // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-  greetMsg.value = await invoke("greet", { name: name.value });
-}
 </script>
 
 <style scoped>
