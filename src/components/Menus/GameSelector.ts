@@ -38,7 +38,8 @@ export class Time {
 export interface GameEntry {
     name: string,
     path: string,
-    playTime: Time
+    playTime: Time,
+    isMultiplayer: false
     
 }
 

@@ -23,7 +23,7 @@
           >
             <v-card-title class="text-h6">{{ game.name }}</v-card-title>
             <v-card-subtitle class="text-caption text-grey-darken-1">{{ game.path }}</v-card-subtitle>
-            <v-card-text>{{ game.playTime.seconds }}</v-card-text>
+            <v-card-text> {{ game.playTime.hours }}:{{ game.playTime.minutes }}:{{ game.playTime.seconds }}</v-card-text>
             <v-card-actions v-if="isSinglePlayer">
               <v-btn color="primary" @click.stop="launch_game(game)">Start</v-btn>
             </v-card-actions>
@@ -62,7 +62,8 @@ import Chat from '../Chat.vue';
   const selected_game = ref<GameSelector.GameEntry>({
     name: "", 
     path: "",
-    playTime: new GameSelector.Time(0)});
+    playTime: new GameSelector.Time(0),
+    isMultiplayer: false});
   const isSinglePlayer = ref(true);
   const ipAddr = ref("");
 
@@ -102,7 +103,8 @@ import Chat from '../Chat.vue';
       const newGame: GameSelector.GameEntry = {
         name: `Test${index}`, 
         path: "wewewe", 
-        playTime: new GameSelector.Time(0)};
+        playTime: new GameSelector.Time(0),
+      isMultiplayer: false};
       list.push(newGame);
     }
 

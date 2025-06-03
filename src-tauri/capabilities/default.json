@@ -3,7 +3,7 @@
   "identifier": "default",
   "description": "Capability for the main window",
   "windows": [
-    "main"
+    "main", "logger"
   ],
   "permissions": [
     "core:default",
@@ -32,6 +32,8 @@
     "fs:scope-appdata-recursive",
     "fs:allow-open",
     "fs:allow-remove",
-    "fs:allow-appdata-read"
+    "fs:allow-appdata-read",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten"
   ]
 }

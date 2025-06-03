@@ -1,26 +1,35 @@
 <template>
   <main class="container">
-    <h1 class="title">Pseudopol</h1>
+    <h1 class="title" @click="Logger.info(4, 1)">Pseudopol</h1>
 
     <MainMenu></MainMenu>
-
-
-
-
     <!--Update DIALOG-->
     <v-dialog v-model="updateDialog" persistent max-width="400">
       <v-card>
         <v-card-title class="text-h6">Update</v-card-title>
-        <v-card-text>
-           Do you want to update the application (recommended)?
+        <v-card-text v-if="dowloadProgress === 0">
+           Do you want to update the application? Certain online features may not work if you are not on the latest version.
+        </v-card-text>
+        <v-progress-linear
+           v-if="dowloadProgress > 0"
+          :model-value="dowloadProgress"
+          color="blue"
+          height="8"
+          rounded
+          striped
+        ></v-progress-linear>
+         <v-card-text v-if="dowloadProgress > 0">
+           Downloaded {{dowloadProgress}} %
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn text @click="updateDialog = false">Abbrechen</v-btn>
-          <v-btn text @click="updateDialog = false ;runUpdater()">OK</v-btn>
+          <v-btn text @click="updateDialog = false">No</v-btn>
+          <v-btn text @click="runUpdater((percent: number) => {dowloadProgress = percent})">Yes</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <LoggerVue></LoggerVue>
 
   </main>
 </template>
@@ -29,12 +38,19 @@
 <script setup lang="ts">
 
 import './style.css';
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import MainMenu from "./components/Menus/MainMenu.vue";
 import {create_games_directory} from "./components/Menus/GameSelector";
 import { check_for_update, runUpdater } from './utils/updater';
+import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
+import LoggerVue from './components/Logger/Logger.vue';
+import Logger from './components/Logger/logger';
+
+
 
 const updateDialog = ref(false);
+const dowloadProgress = ref(0);
+let isLoggerOpen: boolean = false;
 
 onMounted(async() => {
   create_games_directory();
@@ -43,6 +59,41 @@ onMounted(async() => {
   }
   
 });
+
+watch(dowloadProgress, (newVal, oldVal) => {
+  if(dowloadProgress.value >= 100) {
+    updateDialog.value = false;
+    dowloadProgress.value = 0;
+  }
+});
+
+
+async function openLoggerWindow() {
+  const existing = await WebviewWindow.getByLabel('logger');
+  if (existing) {
+    existing.setFocus();
+    return;
+  }
+
+  new WebviewWindow('logger', {
+    url: '/logger.html',
+    title: "Logger",
+    width: 800,
+    height: 600,
+    resizable: true,
+  });
+
+}
+
+
+window.addEventListener('keydown', (event) => {
+  const isAltF12 = event.altKey && event.key === "F12";
+  if (isAltF12) {
+    event.preventDefault();
+    openLoggerWindow();
+  }
+});
+
 
 </script>
 

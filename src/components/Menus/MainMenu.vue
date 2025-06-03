@@ -73,7 +73,7 @@
   
   <script setup lang="ts">
     import { invoke } from '@tauri-apps/api/core';
-    import { ref } from 'vue';
+    import { onMounted, ref } from 'vue';
     import LobbyMenu from './LobbyMenu.vue';
     import SettingsMenu from './SettingsMenu.vue';
 import { Menu, PlayerInfo } from './MenuData';
@@ -87,8 +87,13 @@ const backDialog = ref(false);
 
 const currentTab = ref<Menu>(Menu.MAIN);
 const menuHistory: Menu[] = [];
-const playerInfo = ref<PlayerInfo>({maxPlayers: 1, isSinglePlayer: true, isHost: true});
+const playerInfo = ref<PlayerInfo>({maxPlayers: 1, isSinglePlayer: true, isHost: false});
 
+
+onMounted(async() => {
+
+
+});
 
 const try_joining = (() => {
     joinDialog.value = false;
@@ -104,6 +109,20 @@ const try_joining = (() => {
 
 const ipv4Rule = (input: string) => new RegExp("^(\\d{1,3}\\.){3}\\d{1,3}$").test(input) ? true : "Invalid IP-Address"
     
+window.addEventListener('keydown', (event) => {
+  const isAltO = event.altKey && event.key === "o";
+  if (isAltO) {
+    event.preventDefault();
+    
+    if (currentTab.value !== Menu.SETTINGS) {
+      open_settings();
+    }
+    else {
+      back_to_last_menu();
+    }
+
+  }
+});
 
 
 const enter_single_player = (() => {
