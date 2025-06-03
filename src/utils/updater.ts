@@ -1,7 +1,7 @@
 import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 
-export async function runUpdater() {
+export async function runUpdater(onProgress: (progress: number) => void) {
 
 
 
@@ -23,9 +23,14 @@ export async function runUpdater() {
                         break;
                     case "Progress":
                         downloaded += event.data.chunkLength;
+                        if (contentLength) {
+                            const percent = (downloaded / contentLength) * 100;
+                            onProgress(Math.min(100, Math.floor(percent)));
+                        }
                         console.log(`downloaded ${downloaded} from ${contentLength ?? "unknown"}`);
                         break;
                     case "Finished":
+                        onProgress(100);
                         console.log("download finished");
                         break;
                 }

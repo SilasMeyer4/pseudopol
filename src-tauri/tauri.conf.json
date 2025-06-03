@@ -10,11 +10,15 @@
     "frontendDist": "../dist"
   },
   "app": {
+    
     "windows": [
       {
-        "title": "pseudopol",
+        "title": "Pseudopol",
+        "label": "main",
         "width": 1280,
-        "height": 720
+        "height": 720,
+        "url": "index.html",
+        "visible": true
       }
     ],
     "security": {
