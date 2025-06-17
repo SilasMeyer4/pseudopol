@@ -1,11 +1,11 @@
 export enum Menu {
-    MAIN,
-    LOBBY,
-    SETTINGS
+  MAIN,
+  LOBBY,
+  SETTINGS,
 }
 
 export interface PlayerInfo {
-    maxPlayers: number;
-    isSinglePlayer: boolean,
-    isHost: boolean
+  maxPlayers: number;
+  isSinglePlayer: boolean;
+  isHost: boolean;
 }

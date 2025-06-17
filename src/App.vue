@@ -8,93 +8,94 @@
       <v-card>
         <v-card-title class="text-h6">Update</v-card-title>
         <v-card-text v-if="dowloadProgress === 0">
-           Do you want to update the application? Certain online features may not work if you are not on the latest version.
+          Do you want to update the application? Certain online features may not
+          work if you are not on the latest version.
         </v-card-text>
         <v-progress-linear
-           v-if="dowloadProgress > 0"
+          v-if="dowloadProgress > 0"
           :model-value="dowloadProgress"
           color="blue"
           height="8"
           rounded
           striped
         ></v-progress-linear>
-         <v-card-text v-if="dowloadProgress > 0">
-           Downloaded {{dowloadProgress}} %
+        <v-card-text v-if="dowloadProgress > 0">
+          Downloaded {{ dowloadProgress }} %
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="updateDialog = false">No</v-btn>
-          <v-btn text @click="runUpdater((percent: number) => {dowloadProgress = percent})">Yes</v-btn>
+          <v-btn
+            text
+            @click="
+              runUpdater((percent: number) => {
+                dowloadProgress = percent;
+              })
+            "
+            >Yes</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <LoggerVue></LoggerVue>
-
   </main>
 </template>
 
-
 <script setup lang="ts">
-
-import './style.css';
+import "./style.css";
 import { onMounted, ref, watch } from "vue";
 import MainMenu from "./components/Menus/MainMenu.vue";
-import {create_games_directory} from "./components/Menus/GameSelector";
-import { check_for_update, runUpdater } from './utils/updater';
-import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
-import LoggerVue from './components/Logger/Logger.vue';
-import Logger from './components/Logger/logger';
-
-
+import { createGamesDirectory as createGamesDirectory } from "./components/Menus/GameSelector";
+import {
+  check_for_update as checkForUpdate,
+  runUpdater,
+} from "./utils/updater";
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import LoggerVue from "./components/Logger/Logger.vue";
+import Logger from "./components/Logger/logger";
 
 const updateDialog = ref(false);
 const dowloadProgress = ref(0);
 let isLoggerOpen: boolean = false;
 
-onMounted(async() => {
-  create_games_directory();
-  if (await check_for_update()) {
+onMounted(async () => {
+  createGamesDirectory();
+  if (await checkForUpdate()) {
     updateDialog.value = true;
   }
-  
 });
 
 watch(dowloadProgress, (newVal, oldVal) => {
-  if(dowloadProgress.value >= 100) {
+  if (dowloadProgress.value >= 100) {
     updateDialog.value = false;
     dowloadProgress.value = 0;
   }
 });
 
-
 async function openLoggerWindow() {
-  const existing = await WebviewWindow.getByLabel('logger');
+  const existing = await WebviewWindow.getByLabel("logger");
   if (existing) {
     existing.setFocus();
     return;
   }
 
-  new WebviewWindow('logger', {
-    url: '/logger.html',
+  new WebviewWindow("logger", {
+    url: "/logger.html",
     title: "Logger",
     width: 800,
     height: 600,
     resizable: true,
   });
-
 }
 
-
-window.addEventListener('keydown', (event) => {
+window.addEventListener("keydown", (event) => {
   const isAltF12 = event.altKey && event.key === "F12";
   if (isAltF12) {
     event.preventDefault();
     openLoggerWindow();
   }
 });
-
-
 </script>
 
 <style scoped>
@@ -105,7 +106,6 @@ window.addEventListener('keydown', (event) => {
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #249b73);
 }
-
 </style>
 <style>
 :root {
@@ -217,5 +217,4 @@ button {
     background-color: #0f0f0f69;
   }
 }
-
 </style>

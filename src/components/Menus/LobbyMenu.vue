@@ -1,16 +1,23 @@
 <template>
   <v-container>
-  <v-text class="text-subtitle-2 ip-adress" v-if="playerInfo.isHost">{{ipAddr}}</v-text>
+    <v-text class="text-subtitle-2 ip-adress" v-if="playerInfo.isHost">{{
+      ipAddr
+    }}</v-text>
     <v-container>
       <Chat></Chat>
     </v-container>
 
-    <v-btn @click="add_game">Add Test Data</v-btn>
-    <div>
-        Selected Game: {{selected_game.name}}
-    </div>
-     <v-container class="game-selector" :class="{'single-player': isSinglePlayer}">
-      <v-row :class="[isSinglePlayer ? 'vertical-scroll-row' : 'horizontal-scroll-row']">
+    <v-btn @click="addGame">Add Test Data</v-btn>
+    <div>Selected Game: {{ selectedGame.name }}</div>
+    <v-container
+      class="game-selector"
+      :class="{ 'single-player': isSinglePlayer }"
+    >
+      <v-row
+        :class="[
+          isSinglePlayer ? 'vertical-scroll-row' : 'horizontal-scroll-row',
+        ]"
+      >
         <v-col
           v-for="game in games"
           :key="game.name"
@@ -19,112 +26,103 @@
         >
           <v-card
             class="elevation-4 rounded-xl pa-4 game-card-inner"
-            @click="select_game(game)"
+            @click="selectGame(game)"
           >
             <v-card-title class="text-h6">{{ game.name }}</v-card-title>
-            <v-card-subtitle class="text-caption text-grey-darken-1">{{ game.path }}</v-card-subtitle>
-            <v-card-text> {{ game.playTime.hours }}:{{ game.playTime.minutes }}:{{ game.playTime.seconds }}</v-card-text>
+            <v-card-subtitle class="text-caption text-grey-darken-1">{{
+              game.path
+            }}</v-card-subtitle>
+            <v-card-text>
+              {{ game.playTime.hours }}:{{ game.playTime.minutes }}:{{
+                game.playTime.seconds
+              }}</v-card-text
+            >
             <v-card-actions v-if="isSinglePlayer">
-              <v-btn color="primary" @click.stop="launch_game(game)">Start</v-btn>
+              <v-btn color="primary" @click.stop="launchGame(game)"
+                >Start</v-btn
+              >
             </v-card-actions>
           </v-card>
         </v-col>
       </v-row>
     </v-container>
 
-  <v-btn @click="launch_game(selected_game)" class="start-game-btn">Start Game</v-btn>
-
-
+    <v-btn @click="launchGame(selectedGame)" class="start-game-btn"
+      >Start Game</v-btn
+    >
   </v-container>
+</template>
 
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
+import * as GameSelector from "./GameSelector";
+import { invoke } from "@tauri-apps/api/core";
+import { PlayerInfo } from "./MenuData";
+import Chat from "../Chat.vue";
 
-  
+const props = defineProps<{
+  playerInfo: PlayerInfo;
+}>();
 
+const games = ref<GameSelector.GameList>();
+const selectedGame = ref<GameSelector.GameEntry>({
+  name: "",
+  path: "",
+  playTime: new GameSelector.Time(0),
+  isMultiplayer: false,
+});
+const isSinglePlayer = ref(true);
+const ipAddr = ref("");
 
-  </template>
-  
-  
-  
-  <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-  import * as GameSelector from "./GameSelector";
-  import { invoke } from '@tauri-apps/api/core';
-import { PlayerInfo } from './MenuData';
-import Chat from '../Chat.vue';
-  
+onMounted(async () => {
+  isSinglePlayer.value = props.playerInfo.isSinglePlayer;
 
-  const props = defineProps<{
-    playerInfo: PlayerInfo;
-  }>()
+  if (props.playerInfo.isHost) {
+    ipAddr.value = await invoke("get_public_ip");
+  }
 
+  games.value = await GameSelector.loadGameEntries();
+  console.log(games);
+});
 
-  const games = ref<GameSelector.GameList>();
-  const selected_game = ref<GameSelector.GameEntry>({
-    name: "", 
-    path: "",
-    playTime: new GameSelector.Time(0),
-    isMultiplayer: false});
-  const isSinglePlayer = ref(true);
-  const ipAddr = ref("");
+const selectGame = (game: GameSelector.GameEntry) => {
+  selectedGame.value = game;
+};
 
-  onMounted(async () => {
-    isSinglePlayer.value = props.playerInfo.isSinglePlayer;
-
-    if (props.playerInfo.isHost) {
-      ipAddr.value = await invoke("get_public_ip");
+const launchGame = (game: GameSelector.GameEntry) => {
+  invoke("launch_game", { path: game.path }).then((timePlayed) => {
+    console.log("typescript", timePlayed);
+    game.playTime.addSec(timePlayed as number);
+    if (games.value) {
+      GameSelector.saveGamesList(games.value);
     }
-
-
-    games.value = await GameSelector.load_game_entries();
-    console.log(games);
   });
+};
 
-  const select_game = ((game: GameSelector.GameEntry) => {
-    selected_game.value = game;
-  });
+const addGame = () => {
+  let list: GameSelector.GameList = [];
+  for (let index = 0; index < 10; index++) {
+    const newGame: GameSelector.GameEntry = {
+      name: `Test${index}`,
+      path: "wewewe",
+      playTime: new GameSelector.Time(0),
+      isMultiplayer: false,
+    };
+    list.push(newGame);
+  }
 
-  const launch_game = ((game: GameSelector.GameEntry) => {
-      invoke("launch_game", {path: game.path})
-        .then((timePlayed) => {
-            console.log("typescript", timePlayed);
-            game.playTime.addSec(timePlayed as number);
-            if (games.value)
-            {
-              GameSelector.save_games_list(games.value);
-            }
-          
-        });
-     
-  });
+  loadGames();
+  GameSelector.saveGamesList(list);
+  GameSelector.openAppdataInFileSystem();
+};
 
-  const add_game = (() => {
-    let list: GameSelector.GameList = [];
-    for (let index = 0; index < 10; index++) {
-      const newGame: GameSelector.GameEntry = {
-        name: `Test${index}`, 
-        path: "wewewe", 
-        playTime: new GameSelector.Time(0),
-      isMultiplayer: false};
-      list.push(newGame);
-    }
+const loadGames = async () => {
+  games.value = await GameSelector.loadGameEntries();
+  console.log(games);
+};
+</script>
 
-    load_games();
-    GameSelector.save_games_list(list);
-    GameSelector.open_appdata_in_file_system();
-  });
-
-
-  const load_games = (async () => {
-    games.value = await GameSelector.load_game_entries();
-    console.log(games);
-  });
-
-
-
-
-  </script>
-  
-  <style scoped>
+<style scoped>
 .game-selector {
   padding-bottom: 16px;
   margin-top: 20px;
@@ -185,19 +183,16 @@ import Chat from '../Chat.vue';
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
-.start-game-btn{
+.start-game-btn {
   position: absolute;
   bottom: 0px;
   right: 16px;
   z-index: 1; /* Ensures it stays on top */
-
 }
 
-.ip-adress{
+.ip-adress {
   position: relative;
   top: -3vh; /* Move up by 10 pixels */
 }
-  </style>
-  <style>
-
-  </style>
+</style>
+<style></style>

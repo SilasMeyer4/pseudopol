@@ -1,15 +1,8 @@
 <template>
-    <div><p>Hallo das hier ist ein Test</p></div>
-  </template>
-  
-  
-  <script setup lang="ts">
+  <div><p>Hallo das hier ist ein Test</p></div>
+</template>
 
-  </script>
-  
-  <style scoped>
+<script setup lang="ts"></script>
 
-  </style>
-  <style>
-
-  </style>
+<style scoped></style>
+<style></style>

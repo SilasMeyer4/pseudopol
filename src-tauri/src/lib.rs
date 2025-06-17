@@ -1,4 +1,5 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+mod file_system;
 mod launch;
 mod network;
 
@@ -26,6 +27,7 @@ pub fn run() {
             websocket::send_message,
             websocket::close_websocket,
             launch::launch_game,
+            file_system::get_icon_from_file_path,
         ])
         .setup(|_app| Ok(()))
         .run(tauri::generate_context!())
