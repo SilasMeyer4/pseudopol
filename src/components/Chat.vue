@@ -1,5 +1,6 @@
 <template>
   <v-container class="chat-box">
+    <!-- Chat message display area -->
     <div class="chat-container" ref="chatContainer">
       <v-card
         v-for="(msg, index) in messages"
@@ -14,6 +15,7 @@
       </v-card>
     </div>
 
+    <!-- Input area for sending messages -->
     <div class="chat-input">
       <textarea
         name=""
@@ -22,6 +24,7 @@
         v-model="inputField"
       ></textarea>
       <v-btn @click="sendMessage">Send</v-btn>
+      <!-- Button for testing receiving a message -->
       <v-btn @click="receiveMessage({ from: 'Somone', message: 'TestMessage' })"
         >receive test</v-btn
       >
@@ -30,16 +33,30 @@
 </template>
 
 <script setup lang="ts">
-import { sendMessageToWebsocket, getPublicIP } from "./network/client";
-import { nextTick, ref } from "vue";
+import { ref, nextTick } from "vue";
+import { sendMessageToWebsocket } from "./network/client";
 import { invoke } from "@tauri-apps/api/core";
-
+/**
+ * Type for a chat message.
+ * @property from - The sender of the message.
+ * @property message - The message content.
+ */
 type Message = { from: string; message: string };
 
+// Reference to the chat container DOM element for scrolling
 const chatContainer = ref<HTMLElement>();
+// The current value of the input field
 const inputField = ref<string>("");
+// List of all chat messages
 const messages = ref<Message[]>([]);
 
+/**
+ * Sends a message from the user.
+ * - Adds the message to the chat
+ * - Sends a message to the websocket
+ * - Gets the public IP from Rust backend (for demonstration)
+ * - Scrolls chat to bottom
+ */
 const sendMessage = async () => {
   if (!inputField.value.trim()) return;
   const myMessage: Message = { from: "Me", message: inputField.value };
@@ -48,17 +65,25 @@ const sendMessage = async () => {
 
   sendMessageToWebsocket("wiw");
 
+  // Example: get public IP from Rust backend
   let ip = await invoke("get_public_ip");
   console.log("Public IP from rust:", ip);
 
   scrollChatDown();
 };
 
+/**
+ * Receives a message and adds it to the chat.
+ * @param message - The message to add
+ */
 const receiveMessage = async (message: Message) => {
   messages.value.push(message);
   scrollChatDown();
 };
 
+/**
+ * Scrolls the chat container to the bottom after DOM update.
+ */
 const scrollChatDown = () => {
   nextTick(() => {
     if (chatContainer.value) {

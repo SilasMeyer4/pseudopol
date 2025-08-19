@@ -1,14 +1,21 @@
 <template>
+  <!-- Main lobby container -->
   <v-container>
+    <!-- Show IP address if player is host -->
     <v-text class="text-subtitle-2 ip-adress" v-if="playerInfo.isHost">{{
       ipAddr
     }}</v-text>
+
+    <!-- Embedded chat component -->
     <v-container>
       <Chat></Chat>
     </v-container>
 
+    <!-- Button to add test data for games -->
     <v-btn @click="addGame">Add Test Data</v-btn>
     <div>Selected Game: {{ selectedGame.name }}</div>
+
+    <!-- Game selection area -->
     <v-container
       class="game-selector"
       :class="{ 'single-player': isSinglePlayer }"
@@ -37,6 +44,7 @@
                 game.playTime.seconds
               }}</v-card-text
             >
+            <!-- Start button for single player games -->
             <v-card-actions v-if="isSinglePlayer">
               <v-btn color="primary" @click.stop="launchGame(game)"
                 >Start</v-btn
@@ -47,6 +55,7 @@
       </v-row>
     </v-container>
 
+    <!-- Start game button for selected game -->
     <v-btn @click="launchGame(selectedGame)" class="start-game-btn"
       >Start Game</v-btn
     >
@@ -60,20 +69,28 @@ import { invoke } from "@tauri-apps/api/core";
 import { PlayerInfo } from "./MenuData";
 import Chat from "../Chat.vue";
 
+// Props: player information passed from parent
 const props = defineProps<{
   playerInfo: PlayerInfo;
 }>();
 
+// List of all games
 const games = ref<GameSelector.GameList>();
+// Currently selected game
 const selectedGame = ref<GameSelector.GameEntry>({
   name: "",
   path: "",
   playTime: new GameSelector.Time(0),
   isMultiplayer: false,
 });
+// Whether the lobby is in single player mode
 const isSinglePlayer = ref(true);
+// IP address for host display
 const ipAddr = ref("");
 
+/**
+ * Lifecycle: on mount, set up lobby state and load games.
+ */
 onMounted(async () => {
   isSinglePlayer.value = props.playerInfo.isSinglePlayer;
 
@@ -85,10 +102,18 @@ onMounted(async () => {
   console.log(games);
 });
 
+/**
+ * Selects a game from the list.
+ * @param game - The game entry to select
+ */
 const selectGame = (game: GameSelector.GameEntry) => {
   selectedGame.value = game;
 };
 
+/**
+ * Launches the selected game and updates play time.
+ * @param game - The game entry to launch
+ */
 const launchGame = (game: GameSelector.GameEntry) => {
   invoke("launch_game", { path: game.path }).then((timePlayed) => {
     console.log("typescript", timePlayed);
@@ -99,6 +124,9 @@ const launchGame = (game: GameSelector.GameEntry) => {
   });
 };
 
+/**
+ * Adds test data for games and opens app data folder.
+ */
 const addGame = () => {
   let list: GameSelector.GameList = [];
   for (let index = 0; index < 10; index++) {
@@ -116,6 +144,9 @@ const addGame = () => {
   GameSelector.openAppdataInFileSystem();
 };
 
+/**
+ * Loads the list of games from storage.
+ */
 const loadGames = async () => {
   games.value = await GameSelector.loadGameEntries();
   console.log(games);

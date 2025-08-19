@@ -1,9 +1,12 @@
 <template>
   <main class="container">
+    <!-- Main title, clicking logs info for debugging -->
     <h1 class="title" @click="Logger.info(4, 1)">Pseudopol</h1>
 
+    <!-- Main menu component -->
     <MainMenu></MainMenu>
-    <!--Update DIALOG-->
+
+    <!-- Update dialog for application updates -->
     <v-dialog v-model="updateDialog" persistent max-width="400">
       <v-card>
         <v-card-title class="text-h6">Update</v-card-title>
@@ -38,7 +41,7 @@
       </v-card>
     </v-dialog>
 
-    <LoggerVue></LoggerVue>
+    <!-- Logger component for displaying logs -->
   </main>
 </template>
 
@@ -55,10 +58,18 @@ import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import LoggerVue from "./components/Logger/Logger.vue";
 import Logger from "./components/Logger/logger";
 
+// Dialog state for update prompt
 const updateDialog = ref(false);
+// Download progress for update
 const dowloadProgress = ref(0);
+// State to track if logger window is open
 let isLoggerOpen: boolean = false;
 
+/**
+ * Lifecycle hook: runs on component mount.
+ * - Creates the games directory
+ * - Checks for updates and opens dialog if needed
+ */
 onMounted(async () => {
   createGamesDirectory();
   if (await checkForUpdate()) {
@@ -66,6 +77,9 @@ onMounted(async () => {
   }
 });
 
+/**
+ * Watches the download progress and closes the dialog when complete.
+ */
 watch(dowloadProgress, (newVal, oldVal) => {
   if (dowloadProgress.value >= 100) {
     updateDialog.value = false;
@@ -73,6 +87,9 @@ watch(dowloadProgress, (newVal, oldVal) => {
   }
 });
 
+/**
+ * Opens the logger window, or focuses it if already open.
+ */
 async function openLoggerWindow() {
   const existing = await WebviewWindow.getByLabel("logger");
   if (existing) {
@@ -89,6 +106,7 @@ async function openLoggerWindow() {
   });
 }
 
+// Listen for Alt+F12 to open the logger window
 window.addEventListener("keydown", (event) => {
   const isAltF12 = event.altKey && event.key === "F12";
   if (isAltF12) {

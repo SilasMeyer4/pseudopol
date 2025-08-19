@@ -11,29 +11,43 @@ import { openPath } from "@tauri-apps/plugin-opener";
 
 export type GameList = GameEntry[];
 
+/**
+ * Class representing a time duration (hours, minutes, seconds).
+ * Can be constructed with either (hours, minutes, seconds) or (totalSeconds).
+ */
 export class Time {
+  /**
+   * Creates a new Time instance.
+   * @param hours - Hours or total seconds if minutes/seconds are omitted
+   * @param minutes - Minutes (optional)
+   * @param seconds - Seconds (optional)
+   */
   constructor(hours: number, minutes: number, seconds: number);
   constructor(totalSeconds: number);
 
-  constructor(a: number, b?: number, c?: number) {
-    if (b !== undefined && c !== undefined) {
+  constructor(hours: number, minutes?: number, seconds?: number) {
+    if (minutes !== undefined && seconds !== undefined) {
       // Called with (hours, minutes, seconds)
-      this.hours = a;
-      this.minutes = b;
-      this.seconds = c;
+      this.hours = hours;
+      this.minutes = minutes;
+      this.seconds = seconds;
     } else {
       // Called with (totalSeconds)
-      const totalSeconds = a;
+      const totalSeconds = hours;
       this.seconds = totalSeconds % 60;
-      this.minutes = (totalSeconds / 60) % 60;
-      this.hours = totalSeconds / 3600;
+      this.minutes = Math.floor((totalSeconds / 60) % 60);
+      this.hours = Math.floor(totalSeconds / 3600);
     }
   }
 
+  /**
+   * Adds seconds to the current time.
+   * @param seconds - Number of seconds to add
+   */
   public addSec(seconds: number) {
     this.seconds += seconds % 60;
-    this.minutes += (seconds / 60) % 60;
-    this.hours += seconds / 3600;
+    this.minutes += Math.floor((seconds / 60) % 60);
+    this.hours += Math.floor(seconds / 3600);
   }
 
   hours: number = 0;
@@ -41,6 +55,13 @@ export class Time {
   seconds: number = 0;
 }
 
+/**
+ * Interface for a game entry in the game list.
+ * @property name - Name of the game
+ * @property path - File path to the game
+ * @property playTime - Time played (Time instance)
+ * @property isMultiplayer - Whether the game is multiplayer
+ */
 export interface GameEntry {
   name: string;
   path: string;
@@ -49,8 +70,8 @@ export interface GameEntry {
 }
 
 /**
- * @param game_list Liste von Game Entries
- * Makes some nice things
+ * Saves the game list to a JSON file in the app data directory.
+ * @param game_list - List of game entries to save
  */
 export async function saveGamesList(game_list: GameList) {
   let jsonData = JSON.stringify(game_list, null, 2);
@@ -61,8 +82,9 @@ export async function saveGamesList(game_list: GameList) {
 }
 
 /**
- * @returns Game List
- * Makes some nice things2
+ * Loads the game list from the JSON file in the app data directory.
+ * Converts plain objects to proper Time instances.
+ * @returns Promise resolving to the loaded game list
  */
 export async function loadGameEntries(): Promise<GameList> {
   let jsonData = await readTextFile("games\\entries.json", {
@@ -81,10 +103,16 @@ export async function loadGameEntries(): Promise<GameList> {
   }));
 }
 
+/**
+ * Opens the app data directory in the file system.
+ */
 export async function openAppdataInFileSystem() {
   openPath(await appDataDir());
 }
 
+/**
+ * Creates the games directory in the app data folder if it does not exist.
+ */
 export async function createGamesDirectory() {
   try {
     const doesDataDirExist = await exists(`games`, {
@@ -100,10 +128,19 @@ export async function createGamesDirectory() {
   }
 }
 
+/**
+ * Sanitizes a file name by replacing invalid characters with underscores.
+ * @param name - The file name to sanitize
+ * @returns The sanitized file name
+ */
 export function sanitizeFileName(name: string): string {
   return name.replace(/[<>:"/\\|?*]/g, "_");
 }
 
+/**
+ * Removes a game file by name from the data/characters directory.
+ * @param name - The name of the game to remove
+ */
 export async function removeGame(name: string) {
   const sanitizedName = sanitizeFileName(name);
   await remove(`data/characters/${sanitizedName}.json`, {

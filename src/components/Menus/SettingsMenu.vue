@@ -1,6 +1,8 @@
 <template>
+  <!-- Settings menu layout -->
   <v-container fluid class="settings-menu">
     <v-row no-gutters>
+      <!-- Sidebar with settings options -->
       <v-col cols="2" class="settings-sidebar">
         <v-list class="settings-list">
           <v-list-item
@@ -15,11 +17,14 @@
         </v-list>
       </v-col>
 
+      <!-- Main content area for selected setting -->
       <v-col cols="10" class="settings-body">
+        <!-- General settings page -->
         <div v-if="selectedSetting === Settings.GENERAL">
           Genral setting page
         </div>
 
+        <!-- Data management page -->
         <v-container v-if="selectedSetting === Settings.DATA" fluid>
           <v-row class="mb-4">
             <v-col cols="12">
@@ -28,6 +33,7 @@
           </v-row>
 
           <v-row>
+            <!-- Input for adding a new game -->
             <v-col cols="6">
               <v-text-field
                 block
@@ -36,12 +42,14 @@
               ></v-text-field>
             </v-col>
 
+            <!-- Button to open file selector for adding a game -->
             <v-col cols="6">
               <v-btn block @click="openGameSelector(addedGameName)"
                 >Add Game</v-btn
               >
             </v-col>
 
+            <!-- Dropdown to select a game for deletion -->
             <v-col cols="6">
               <v-select
                 v-model="selectedGame"
@@ -53,14 +61,17 @@
               />
             </v-col>
 
+            <!-- Button to delete the selected game -->
             <v-col cols="6">
               <v-btn block @click="removeGame(selectedGame)">Delete Game</v-btn>
             </v-col>
           </v-row>
         </v-container>
 
+        <!-- Bug report page -->
         <div v-if="selectedSetting === Settings.BUG">Bug Report page</div>
 
+        <!-- About page -->
         <div v-if="selectedSetting === Settings.ABOUT">
           Peudopol created by Dennis Probst and Silas Meyer
         </div>
@@ -68,7 +79,7 @@
     </v-row>
   </v-container>
 
-  <!--BACK BUTTON DIALOG-->
+  <!-- Dialog for adding new games -->
   <v-dialog v-model="newGamesDialog" persistent max-width="90vw">
     <v-card>
       <v-card-title class="text-h6">Adding Games</v-card-title>
@@ -106,24 +117,39 @@ import { invoke } from "@tauri-apps/api/core";
 import { path } from "@tauri-apps/api";
 import { appDataDir } from "@tauri-apps/api/path";
 
+// Enum for the different settings pages
 enum Settings {
   GENERAL = "General",
   DATA = "Data",
   BUG = "Bug Report",
   ABOUT = "About",
 }
+// List of all settings options
 const settings = Object.values(Settings);
+// Currently selected settings page
 const selectedSetting = ref(Settings.GENERAL);
+// List of all games
 const gameList = ref<GameSelector.GameList>([]);
+// Currently selected game for deletion
 const selectedGame = ref("");
+// Name input for adding a new game
 const addedGameName = ref("");
+// Dialog state for adding new games
 const newGamesDialog = ref(false);
+// List of new games to be added
 const newGames = ref<GameSelector.GameList>([]);
 
+/**
+ * Loads the list of games when the component is mounted.
+ */
 onMounted(async () => {
   gameList.value = await GameSelector.loadGameEntries();
 });
 
+/**
+ * Opens the file selector dialog to add new games.
+ * @param name - The name for the new game (not used directly here)
+ */
 const openGameSelector = async (name: string) => {
   const files = await open({
     multiple: true,
@@ -143,6 +169,10 @@ const openGameSelector = async (name: string) => {
   }
 };
 
+/**
+ * Adds the selected new games to the game list and saves them.
+ * Also retrieves icons for each game using the backend.
+ */
 const addGames = async () => {
   let iconPath = await appDataDir();
   const formattedGames: GameSelector.GameList = await Promise.all(
@@ -158,7 +188,7 @@ const addGames = async () => {
         path: game.path,
         playTime: new GameSelector.Time(0),
         isMultiplayer: game.isMultiplayer,
-        iconPath: iconPath, //TODO
+        iconPath: iconPath, //TODO: set correct icon path if needed
       };
     })
   );
@@ -168,6 +198,10 @@ const addGames = async () => {
   newGamesDialog.value = false;
 };
 
+/**
+ * Removes a game from the game list by name and saves the updated list.
+ * @param name - The name of the game to remove
+ */
 const removeGame = async (name: string) => {
   console.log(name);
   gameList.value = gameList.value.filter((entry) => entry.name !== name);
@@ -181,7 +215,7 @@ const removeGame = async (name: string) => {
   padding-top: 20px;
   padding-right: 20px;
   height: 100%;
-  border-right: 2px solid black; /* 👈 Thin black separator */
+  border-right: 2px solid black; /* Thin black separator */
 }
 
 .settings-menu {
