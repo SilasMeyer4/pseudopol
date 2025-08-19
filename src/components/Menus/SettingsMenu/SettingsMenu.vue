@@ -70,10 +70,17 @@
 
         <!-- Bug report page -->
         <div v-if="selectedSetting === Settings.BUG">Bug Report page</div>
+        <div
+          v-if="selectedSetting === Settings.BUG"
+          @click="openGitHubIssuePage"
+        >
+          <v-btn>Report Bug</v-btn>
+        </div>
+        <v-btn @click="openAppData">Open Local Data</v-btn>
 
         <!-- About page -->
         <div v-if="selectedSetting === Settings.ABOUT">
-          Peudopol created by Dennis Probst and Silas Meyer
+          Pseudopol created by Dennis Probst and Silas Meyer
         </div>
       </v-col>
     </v-row>
@@ -111,11 +118,12 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import * as GameSelector from "./GameSelector";
+import * as GameSelector from "../GameSelector";
 import { open } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
 import { path } from "@tauri-apps/api";
 import { appDataDir } from "@tauri-apps/api/path";
+import { openPath } from "@tauri-apps/plugin-opener";
 
 // Enum for the different settings pages
 enum Settings {
@@ -167,6 +175,16 @@ const openGameSelector = async (name: string) => {
       };
     });
   }
+};
+
+const openGitHubIssuePage = () => {
+  const url = "https://github.com/SilasMeyer4/pseudopol/issues";
+  window.open(url, "_blank");
+};
+
+const openAppData = async () => {
+  const dir = await appDataDir();
+  openPath(dir);
 };
 
 /**

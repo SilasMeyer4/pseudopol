@@ -9,6 +9,57 @@ import {
 } from "@tauri-apps/plugin-fs";
 import { openPath } from "@tauri-apps/plugin-opener";
 
+/**
+ * Adds test data for games and opens app data folder.
+ * Used for development/testing.
+ */
+export function addTestGames(loadGames: () => void) {
+  let list: GameList = [];
+  for (let index = 0; index < 10; index++) {
+    const newGame: GameEntry = {
+      name: `Test${index}`,
+      path: "wewewe",
+      playTime: new Time(0),
+      isMultiplayer: false,
+    };
+    list.push(newGame);
+  }
+  loadGames();
+  saveGamesList(list);
+  openAppdataInFileSystem();
+}
+
+/**
+ * Selects a game from the list.
+ * @param game - The game entry to select
+ * @param selectedGameRef - The ref to update
+ */
+export function selectGame(
+  game: GameEntry,
+  selectedGameRef: { value: GameEntry }
+) {
+  selectedGameRef.value = game;
+}
+
+/**
+ * Launches the selected game and updates play time.
+ * @param game - The game entry to launch
+ * @param gamesRef - The ref to the games list
+ */
+import { invoke } from "@tauri-apps/api/core";
+export function launchGame(
+  game: GameEntry,
+  gamesRef: { value: GameList | undefined }
+) {
+  invoke("launch_game", { path: game.path }).then((timePlayed) => {
+    console.log("typescript", timePlayed);
+    game.playTime.addSec(timePlayed as number);
+    if (gamesRef.value) {
+      saveGamesList(gamesRef.value);
+    }
+  });
+}
+
 export type GameList = GameEntry[];
 
 /**
@@ -45,9 +96,11 @@ export class Time {
    * @param seconds - Number of seconds to add
    */
   public addSec(seconds: number) {
-    this.seconds += seconds % 60;
-    this.minutes += Math.floor((seconds / 60) % 60);
-    this.hours += Math.floor(seconds / 3600);
+    const totalSeconds =
+      this.hours * 3600 + this.minutes * 60 + this.seconds + seconds;
+    this.seconds = totalSeconds % 60;
+    this.minutes = Math.floor((totalSeconds / 60) % 60);
+    this.hours = Math.floor(totalSeconds / 3600);
   }
 
   hours: number = 0;

@@ -56,7 +56,10 @@
     </v-container>
 
     <!-- Start game button for selected game -->
-    <v-btn @click="launchGame(selectedGame)" class="start-game-btn"
+    <v-btn
+      v-if="!isSinglePlayer"
+      @click="launchGame(selectedGame)"
+      class="start-game-btn"
       >Start Game</v-btn
     >
   </v-container>
@@ -65,9 +68,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import * as GameSelector from "./GameSelector";
-import { invoke } from "@tauri-apps/api/core";
 import { PlayerInfo } from "./MenuData";
 import Chat from "../Chat.vue";
+import { invoke } from "@tauri-apps/api/core";
 
 // Props: player information passed from parent
 const props = defineProps<{
@@ -106,42 +109,29 @@ onMounted(async () => {
  * Selects a game from the list.
  * @param game - The game entry to select
  */
+
+// Use GameSelector's selectGame
 const selectGame = (game: GameSelector.GameEntry) => {
-  selectedGame.value = game;
+  GameSelector.selectGame(game, selectedGame);
 };
 
 /**
  * Launches the selected game and updates play time.
  * @param game - The game entry to launch
  */
+
+// Use GameSelector's launchGame
 const launchGame = (game: GameSelector.GameEntry) => {
-  invoke("launch_game", { path: game.path }).then((timePlayed) => {
-    console.log("typescript", timePlayed);
-    game.playTime.addSec(timePlayed as number);
-    if (games.value) {
-      GameSelector.saveGamesList(games.value);
-    }
-  });
+  GameSelector.launchGame(game, games);
 };
 
 /**
  * Adds test data for games and opens app data folder.
  */
-const addGame = () => {
-  let list: GameSelector.GameList = [];
-  for (let index = 0; index < 10; index++) {
-    const newGame: GameSelector.GameEntry = {
-      name: `Test${index}`,
-      path: "wewewe",
-      playTime: new GameSelector.Time(0),
-      isMultiplayer: false,
-    };
-    list.push(newGame);
-  }
 
-  loadGames();
-  GameSelector.saveGamesList(list);
-  GameSelector.openAppdataInFileSystem();
+// Use GameSelector's addTestGames
+const addGame = () => {
+  GameSelector.addTestGames(loadGames);
 };
 
 /**

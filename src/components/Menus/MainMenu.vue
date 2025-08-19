@@ -91,7 +91,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { onMounted, ref } from "vue";
 import LobbyMenu from "./LobbyMenu.vue";
-import SettingsMenu from "./SettingsMenu.vue";
+import SettingsMenu from "./SettingsMenu/SettingsMenu.vue";
 import { Menu, PlayerInfo } from "./MenuData";
 
 // Dialog state for join server dialog
